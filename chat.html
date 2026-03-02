@@ -5,6 +5,173 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EpanD AI - Chat</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Tambahan CSS untuk memastikan layout stabil */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .navbar {
+            flex-shrink: 0;
+            padding: 15px 0;
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+            min-height: 0;
+            height: calc(100vh - 80px);
+            margin-top: 10px;
+        }
+        
+        .chat-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: 100%;
+            overflow-y: auto;
+        }
+        
+        .chat-main {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            min-height: 0;
+            scroll-behavior: smooth;
+        }
+        
+        .chat-input-container {
+            flex-shrink: 0;
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .chat-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            max-width: 100%;
+        }
+        
+        .chat-input-wrapper textarea {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: none;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.5;
+            max-height: 150px;
+            min-height: 50px;
+        }
+        
+        .chat-input-wrapper textarea:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+        }
+        
+        .chat-input-wrapper button {
+            padding: 12px 24px;
+            height: fit-content;
+            white-space: nowrap;
+        }
+        
+        .message {
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .loading {
+            opacity: 0.7;
+        }
+        
+        .loading .message-content::after {
+            content: '...';
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { content: '.'; }
+            33% { content: '..'; }
+            66% { content: '...'; }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .chat-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .chat-sidebar {
+                display: none;
+            }
+            
+            .chat-input-wrapper {
+                flex-direction: column;
+            }
+            
+            .chat-input-wrapper button {
+                width: 100%;
+            }
+        }
+        
+        /* Custom scrollbar */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -17,7 +184,7 @@
                 <a href="settings.html">Settings</a>
             </div>
             <div class="user-info" id="userInfo">
-                <span id="username"></span>
+                <span id="usernameDisplay"></span>
                 <button onclick="logout()" class="btn-logout">Logout</button>
             </div>
         </nav>
@@ -25,14 +192,22 @@
         <div class="chat-container">
             <div class="chat-sidebar">
                 <div class="model-selector">
-                    <label for="modelSelect">Pilih Model:</label>
+                    <label for="modelSelect">Pilih Model AI:</label>
                     <select id="modelSelect" class="model-select">
                         <option value="nvidia/nemotron-nano-9b-v2:free">Nemotron Nano 9B v2</option>
                         <option value="nvidia/nemotron-nano-12b-v2-vl:free">Nemotron Nano 12B 2 VL</option>
                         <option value="nvidia/nemotron-3-nano-30b-a3b:free">Nemotron 3 Nano 30B A3B</option>
                     </select>
                 </div>
-                <button onclick="newChat()" class="btn btn-secondary btn-full">New Chat</button>
+                
+                <div class="chat-info">
+                    <h4>Info Chat</h4>
+                    <p>Total pesan: <span id="messageCount">1</span></p>
+                    <p>Model aktif: <span id="activeModel">GPT-3.5 Turbo</span></p>
+                </div>
+                
+                <button onclick="newChat()" class="btn btn-secondary btn-full">+ New Chat</button>
+                <button onclick="clearChat()" class="btn btn-secondary btn-full">Clear Chat</button>
             </div>
 
             <div class="chat-main">
@@ -44,13 +219,26 @@
                     </div>
                 </div>
 
-                <div class="chat-input-area">
-                    <textarea id="userInput" placeholder="Ketik pesan Anda..." rows="3"></textarea>
-                    <button onclick="sendMessage()" class="btn btn-primary">Kirim</button>
+                <div class="chat-input-container">
+                    <div class="chat-input-wrapper">
+                        <textarea 
+                            id="userInput" 
+                            placeholder="Ketik pesan Anda... (Enter untuk kirim, Shift+Enter untuk baris baru)" 
+                            rows="1"
+                            oninput="autoResizeTextarea(this)"
+                        ></textarea>
+                        <button onclick="sendMessage()" class="btn btn-primary" id="sendButton">
+                            Kirim
+                        </button>
+                    </div>
+                    <div style="font-size: 12px; color: #999; margin-top: 5px; text-align: right;">
+                        Tekan Enter untuk kirim
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    
     <script src="config/config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/chat.js"></script>
