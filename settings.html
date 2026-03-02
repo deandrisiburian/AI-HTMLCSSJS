@@ -2,89 +2,223 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>EpanD AI - Settings</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="gradient-orb"></div>
+        <div class="gradient-orb"></div>
+        <div class="gradient-orb"></div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+
     <div class="container">
+        <!-- Navbar -->
         <nav class="navbar">
             <div class="logo">EpanD AI</div>
-            <div class="nav-links">
+            
+            <!-- Hamburger Menu Button -->
+            <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <!-- Navigation Links -->
+            <div class="nav-links" id="navLinks">
                 <a href="index.html">Home</a>
                 <a href="login.html">Login</a>
                 <a href="chat.html">Chat</a>
                 <a href="settings.html" class="active">Settings</a>
+                
+                <!-- Mobile User Info -->
+                <div class="mobile-user-info" id="mobileUserInfo" style="display: none;">
+                    <span id="mobileUsername"></span>
+                    <button onclick="logout()" class="btn-logout">Logout</button>
+                </div>
             </div>
-            <div class="user-info" id="userInfo">
-                <span id="username"></span>
+
+            <!-- Desktop User Info -->
+            <div class="user-info desktop-only" id="userInfo">
+                <span id="usernameDisplay"></span>
                 <button onclick="logout()" class="btn-logout">Logout</button>
             </div>
         </nav>
 
+        <!-- Settings Content -->
         <div class="settings-container">
             <h2>Pengaturan</h2>
             
-            <div class="settings-section">
-                <h3>Pengaturan Umum</h3>
-                <div class="setting-item">
-                    <label for="theme">Tema:</label>
-                    <select id="theme" onchange="saveSetting('theme', this.value)">
-                        <option value="light">Terang</option>
-                        <option value="dark">Gelap</option>
-                    </select>
+            <!-- Settings Tabs Mobile -->
+            <div class="settings-tabs mobile-only">
+                <button class="tab-btn active" onclick="showSettingTab('general')">Umum</button>
+                <button class="tab-btn" onclick="showSettingTab('chat')">Chat</button>
+                <button class="tab-btn" onclick="showSettingTab('api')">API</button>
+                <button class="tab-btn" onclick="showSettingTab('account')">Akun</button>
+            </div>
+            
+            <!-- General Settings -->
+            <div class="settings-section" id="generalSettings">
+                <div class="section-header">
+                    <h3>Pengaturan Umum</h3>
+                    <span class="section-icon">⚙️</span>
                 </div>
-                <div class="setting-item">
-                    <label for="language">Bahasa:</label>
-                    <select id="language" onchange="saveSetting('language', this.value)">
-                        <option value="id">Indonesia</option>
-                        <option value="en">English</option>
-                    </select>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label for="theme">Tema:</label>
+                        <div class="setting-control">
+                            <select id="theme" onchange="saveSetting('theme', this.value)">
+                                <option value="light">Terang</option>
+                                <option value="dark">Gelap</option>
+                                <option value="auto">Auto (Sistem)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label for="language">Bahasa:</label>
+                        <div class="setting-control">
+                            <select id="language" onchange="saveSetting('language', this.value)">
+                                <option value="id">Indonesia</option>
+                                <option value="en">English</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label for="notifications">Notifikasi:</label>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="notifications" onchange="saveSetting('notifications', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="settings-section">
-                <h3>Pengaturan Chat</h3>
-                <div class="setting-item">
-                    <label for="temperature">Temperature (Kreativitas):</label>
-                    <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7" onchange="saveSetting('temperature', this.value)">
-                    <span id="tempValue">0.7</span>
+            <!-- Chat Settings -->
+            <div class="settings-section" id="chatSettings">
+                <div class="section-header">
+                    <h3>Pengaturan Chat</h3>
+                    <span class="section-icon">💬</span>
                 </div>
-                <div class="setting-item">
-                    <label for="maxTokens">Max Tokens:</label>
-                    <input type="number" id="maxTokens" min="100" max="4000" value="2000" onchange="saveSetting('maxTokens', this.value)">
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label for="temperature">Temperature (Kreativitas):</label>
+                        <div class="setting-control">
+                            <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7" onchange="saveSetting('temperature', this.value)">
+                            <span class="value-badge" id="tempValue">0.7</span>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label for="maxTokens">Max Tokens:</label>
+                        <div class="setting-control">
+                            <input type="number" id="maxTokens" min="100" max="4000" value="2000" onchange="saveSetting('maxTokens', this.value)">
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label for="autoScroll">Auto Scroll:</label>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="autoScroll" checked onchange="saveSetting('autoScroll', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label for="sendOnEnter">Enter untuk kirim:</label>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="sendOnEnter" checked onchange="saveSetting('sendOnEnter', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="settings-section">
-                <h3>Pengaturan API</h3>
-                <div class="setting-item">
-                    <label for="apiKey">OpenRouter API Key:</label>
-                    <input type="password" id="apiKey" value="YOUR_API_KEY" onchange="saveSetting('apiKey', this.value)">
+            <!-- API Settings -->
+            <div class="settings-section" id="apiSettings">
+                <div class="section-header">
+                    <h3>Pengaturan API</h3>
+                    <span class="section-icon">🔑</span>
                 </div>
-                <div class="setting-item">
-                    <label for="apiEndpoint">API Endpoint:</label>
-                    <input type="text" id="apiEndpoint" value="https://openrouter.ai/api/v1/chat/completions" readonly>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label for="apiKey">OpenRouter API Key:</label>
+                        <div class="setting-control">
+                            <div class="password-input">
+                                <input type="password" id="apiKey" value="YOUR_API_KEY" onchange="saveSetting('apiKey', this.value)">
+                                <button class="toggle-password" onclick="togglePassword('apiKey')">👁️</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label for="apiEndpoint">API Endpoint:</label>
+                        <div class="setting-control">
+                            <input type="text" id="apiEndpoint" value="https://openrouter.ai/api/v1/chat/completions" readonly class="readonly-input">
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label>Status API:</label>
+                        <div class="setting-control">
+                            <span class="status-badge success">● Terhubung</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="settings-section">
-                <h3>Informasi Akun</h3>
-                <div class="setting-item">
-                    <label>Username:</label>
-                    <span id="accountUsername"></span>
+            <!-- Account Settings -->
+            <div class="settings-section" id="accountSettings">
+                <div class="section-header">
+                    <h3>Informasi Akun</h3>
+                    <span class="section-icon">👤</span>
                 </div>
-                <div class="setting-item">
-                    <label>Status:</label>
-                    <span id="accountStatus">Active</span>
+                <div class="account-info">
+                    <div class="account-avatar-large">👤</div>
+                    <div class="account-details">
+                        <div class="setting-item">
+                            <label>Username:</label>
+                            <span class="account-value" id="accountUsername">user1</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>Member sejak:</label>
+                            <span class="account-value" id="accountSince">2026</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>Status:</label>
+                            <span class="status-badge success">Active</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <button onclick="resetSettings()" class="btn btn-secondary">Reset ke Default</button>
-            <button onclick="saveAllSettings()" class="btn btn-primary">Simpan Semua</button>
+            <!-- Action Buttons -->
+            <div class="settings-actions">
+                <button onclick="resetSettings()" class="btn btn-secondary">
+                    <span class="btn-icon">↺</span>
+                    Reset
+                </button>
+                <button onclick="saveAllSettings()" class="btn btn-primary">
+                    <span class="btn-icon">✓</span>
+                    Simpan Semua
+                </button>
+            </div>
         </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2026 EpanD AI. All rights reserved.</p>
+        </footer>
     </div>
+
+    <script src="config/config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
