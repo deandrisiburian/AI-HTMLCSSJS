@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>EpanD AI</title>
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(145deg, #b8b9ff 0%, #dfe9ff 70%, #ffffff 100%);
+      background-attachment: fixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      transition: background 0.2s;
+    }
+
+    /* glassmorphism core */
+    .glass-panel {
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      background: rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 40px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255,255,255,0.8);
+    }
+
+    .glass-card {
+      backdrop-filter: blur(16px) saturate(200%);
+      -webkit-backdrop-filter: blur(16px) saturate(200%);
+      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 32px;
+      box-shadow: 0 20px 40px -12px rgba(0,10,30,0.2), inset 0 0 0 1px rgba(255,255,255,0.7);
+    }
+
+    #app {
+      width: 100%;
+      max-width: 1400px;
+      min-height: 85vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0.6; transform: scale(0.99); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* ------ LOGIN PAGE ------ */
+    .login-container {
+      max-width: 480px;
+      margin: 2rem auto;
+      padding: 2rem 1.8rem;
+    }
+
+    .logo-area {
+      text-align: center;
+      margin-bottom: 2.2rem;
+    }
+
+    .logo-icon {
+      font-size: 3.4rem;
+      filter: drop-shadow(0 8px 10px rgba(0,40,100,0.2));
+      color: #1e293b;
+    }
+
+    .logo-area h1 {
+      font-weight: 500;
+      font-size: 2.2rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #1e293b, #3a4a66);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-top: 8px;
+    }
+
+    .account-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(255,255,255,0.3);
+      border-radius: 28px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(255,255,255,0.7);
+      backdrop-filter: blur(8px);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .account-row:hover {
+      background: rgba(255,255,255,0.5);
+      border-color: white;
+    }
+
+    .account-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 28px;
+      background: linear-gradient(125deg, #5f7bae, #a0b9e0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 500;
+      color: white;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+
+    .account-info h3 {
+      font-weight: 500;
+      font-size: 1.3rem;
+    }
+
+    .account-info p {
+      color: #2c3c54;
+      font-size: 0.9rem;
+    }
+
+    .btn-login {
+      background: rgba(20, 30, 50, 0.7);
+      border: none;
+      backdrop-filter: blur(10px);
+      color: white;
+      font-weight: 500;
+      font-size: 1.2rem;
+      padding: 1rem;
+      border-radius: 40px;
+      width: 100%;
+      margin-top: 1.8rem;
+      border: 1px solid rgba(255,255,255,0.4);
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    .btn-login:active {
+      transform: scale(0.97);
+      background: rgba(20, 30, 50, 0.9);
+    }
+
+    /* ------ MAIN LAYOUT with SIDEBAR ------ */
+    .main-layout {
+      display: flex;
+      flex-direction: row;
+      gap: 16px;
+      min-height: 80vh;
+    }
+
+    /* SIDEBAR (settings) */
+    .settings-sidebar {
+      width: 280px;
+      backdrop-filter: blur(20px) saturate(200%);
+      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 40px;
+      padding: 1.8rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      height: fit-content;
+    }
+
+    .settings-sidebar h3 {
+      font-weight: 500;
+      font-size: 1.4rem;
+      color: #1e2b3c;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.4);
+      padding-bottom: 12px;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 1rem 0;
+    }
+
+    .setting-item label {
+      font-weight: 450;
+    }
+
+    /* toggle switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 28px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 30px;
+      border: 1px solid white;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: transparent;
+      border-radius: 30px;
+      transition: 0.2s;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 24px;
+      width: 24px;
+      left: 2px;
+      bottom: 2px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.2s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    input:checked + .slider:before {
+      transform: translateX(23px);
+    }
+
+    /* model select in sidebar (secondary) but we also put quick select in navbar */
+    .model-select-side {
+      width: 100%;
+      background: rgba(255,255,255,0.5);
+      border: 1px solid white;
+      border-radius: 30px;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      outline: none;
+      color: #121f33;
+    }
+
+    .api-hint {
+      font-size: 0.85rem;
+      color: #2c3c54;
+      background: rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 12px;
+      margin-top: 8px;
+    }
+
+    .account-mini-side {
+      margin-top: auto;
+      background: rgba(255,255,255,0.2);
+      border-radius: 32px;
+      padding: 1.2rem;
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+
+    .account-mini-side p {
+      margin: 6px 0;
+      word-break: break-word;
+    }
+
+    .logout-btn {
+      background: rgba(255,255,255,0.4);
+      border: 1px solid white;
+      border-radius: 40px;
+      padding: 12px 16px;
+      width: 100%;
+      font-size: 1rem;
+      margin-top: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .logout-btn:active {
+      background: rgba(255,255,255,0.7);
+    }
+
+    /* CHAT AREA (main content) */
+    .chat-content {
+      flex: 1;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* navbar inside chat area */
+    .nav-glass {
+      backdrop-filter: blur(20px);
+      background: rgba(255,255,255,0.4);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 60px;
+      padding: 0.6rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      font-size: 1.5rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .quick-model-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.3);
+      padding: 5px 12px;
+      border-radius: 40px;
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+
+    .quick-model-selector select {
+      background: transparent;
+      border: none;
+      font-size: 0.95rem;
+      padding: 6px 0;
+      outline: none;
+      color: #1e293b;
+      font-weight: 500;
+    }
+
+    .quick-model-selector i {
+      font-size: 1.2rem;
+      opacity: 0.8;
+    }
+
+    /* chat window */
+    .chat-window {
+      backdrop-filter: blur(16px);
+      background: rgba(255,255,255,0.25);
+      border-radius: 40px;
+      padding: 1.5rem 1rem 1rem 1rem;
+      border: 1px solid rgba(255,255,255,0.5);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 460px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 10px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .message {
+      display: flex;
+      gap: 12px;
+      max-width: 90%;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .avatar-bot, .avatar-user {
+      width: 38px;
+      height: 38px;
+      border-radius: 19px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(4px);
+      border: 1px solid white;
+      color: #2e405b;
+      flex-shrink: 0;
+    }
+
+    .avatar-user {
+      background: #cbd5e1;
+    }
+
+    .bubble {
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(8px);
+      padding: 12px 18px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.7);
+      font-size: 0.95rem;
+      line-height: 1.4;
+      color: #1e2b3c;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+    }
+
+    .message.user .bubble {
+      background: rgba(230, 240, 255, 0.7);
+      border: 1px solid rgba(255,255,255,0.9);
+    }
+
+    .chat-input-area {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 60px;
+      padding: 6px 6px 6px 18px;
+      border: 1px solid rgba(255,255,255,0.7);
+    }
+
+    .chat-input-area input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      font-size: 1rem;
+      padding: 10px 0;
+      outline: none;
+      color: #121f33;
+    }
+
+    .chat-input-area input::placeholder {
+      color: rgba(30, 40, 60, 0.6);
+    }
+
+    .send-btn {
+      background: rgba(255,255,255,0.7);
+      border: 1px solid white;
+      border-radius: 40px;
+      width: 52px;
+      aspect-ratio: 1/1;
+      font-size: 1.4rem;
+      color: #2e3f5a;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .send-btn:active {
+      background: white;
+      transform: scale(0.9);
+    }
+
+    /* mobile: sidebar collapses to top */
+    @media (max-width: 800px) {
+      .main-layout {
+        flex-direction: column;
+      }
+      .settings-sidebar {
+        width: 100%;
+        order: 2;
+      }
+      .chat-content {
+        order: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen" class="screen active">
+    <div class="glass-panel login-container">
+      <div class="logo-area">
+        <i class="fas fa-sparkles logo-icon"></i>
+        <h1>EpanD AI</h1>
+        <p style="color:#2c3e4e;">Simple Chatbot AI</p>
+      </div>
+      <div style="margin: 1.2rem 0 0.8rem;">
+        <p style="font-weight: 400; margin-bottom: 1rem;">pilih akun demo</p>
+        <!-- Akun 1 -->
+        <div class="account-row" data-username="Alex C." data-email="alex@expand.ai" data-avatar="A">
+          <div class="account-avatar">A</div>
+          <div class="account-info">
+            <h3>Alex C.</h3>
+            <p>alex@expand.ai · 🌟 CC</p>
+          </div>
+        </div>
+        <!-- Akun 2 -->
+        <div class="account-row" data-username="Samira K." data-email="samira@expand.ai" data-avatar="S">
+          <div class="account-avatar">S</div>
+          <div class="account-info">
+            <h3>Samira K.</h3>
+            <p>samira@expand.ai · ⚡ ARC</p>
+          </div>
+        </div>
+      </div>
+      <button class="btn-login" id="loginBtn"> <i class="fas fa-arrow-right-to-bracket" style="margin-right: 8px;"></i> masuk dengan akun dipilih</button>
+      <p style="text-align: center; margin-top: 20px; font-size: 0.9rem;">EpanD Creation</p>
+    </div>
+  </div>
+
+  <!-- MAIN SCREEN with SIDEBAR (settings) -->
+  <div id="mainScreen" class="screen">
+    <div class="main-layout">
+      
+      <!-- LEFT SIDEBAR (settings & akun) -->
+      <aside class="settings-sidebar glass-card" id="settingsSidebar">
+        <h3><i class="fas fa-sliders-h"></i> Pengaturan</h3>
+        
+        <div class="setting-item">
+          <label><i class="far fa-moon"></i> Mode gelap</label>
+          <label class="switch">
+            <input type="checkbox" id="darkModeToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div style="margin: 0.5rem 0 0.2rem;">
+          <label style="font-weight: 500;">Model AI (sidebar)</label>
+          <select id="modelSelectSide" class="model-select-side">
+            <option value="nvidia/nemotron-nano-9b-v2:free" selected>NVIDIA Nano 9B</option>
+            <option value="nvidia/nemotron-nano-12b-v2-vl:free">NVIDIA Nano 12B VL</option>
+            <option value="nvidia/nemotron-3-nano-30b-a3b:free">NVIDIA 30B A3B</option>
+          </select>
+        </div>
+
+        <div class="setting-item">
+          <label><i class="fas fa-temperature-low"></i> Temperature</label>
+          <input type="range" min="0" max="2" step="0.1" value="0.7" id="tempRange" style="width: 110px;">
+        </div>
+
+        <div class="api-hint">
+          <i class="fas fa-key"></i> API Key aktif: <strong>sk-or-...5065</strong> (tersimpan)<br>
+          <span style="font-size: 0.8rem;">(simulasi fetch, lihat console)</span>
+        </div>
+
+        <!-- Account card inside sidebar -->
+        <div class="account-mini-side">
+          <p><strong><i class="fas fa-user-circle"></i> <span id="displayNameSide">Alex C.</span></strong></p>
+          <p id="displayEmailSide">alex@expand.ai</p>
+          <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Keluar</button>
+        </div>
+      </aside>
+
+      <!-- RIGHT CHAT CONTENT -->
+      <div class="chat-content">
+        <!-- Navbar with quick model switcher (NVIDIA models) -->
+        <div class="nav-glass">
+          <div class="nav-brand">
+            <i class="fas fa-cloud" style="font-size: 1.8rem;"></i>
+            <span>EpanD</span>
+          </div>
+          <div class="quick-model-selector">
+            <i class="fas fa-microchip"></i>
+            <select id="quickModelSelect" title="Ganti model AI langsung">
+              <option value="nvidia/nemotron-nano-9b-v2:free" selected>Nano 9B</option>
+              <option value="nvidia/nemotron-nano-12b-v2-vl:free">Nano 12B VL</option>
+              <option value="nvidia/nemotron-3-nano-30b-a3b:free">Nemotron 30B</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Chat window -->
+        <div class="chat-window">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 0 6px;">
+            <span style="font-weight: 500;"><i class="far fa-circle" style="color: #78b578; margin-right: 8px;"></i> EpanD AI · NVIDIA</span>
+            <span style="background: rgba(255,255,255,0.4); padding: 6px 14px; border-radius: 40px;" id="currentModelLabel">nvidia/nemotron-nano-9b-v2:free</span>
+          </div>
+          <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+              <div class="avatar-bot"><i class="fas fa-robot"></i></div>
+              <div class="bubble">Halo! Saya asisten EpanD dengan model NVIDIA. Pilih model di atas atau sidebar.</div>
+            </div>
+          </div>
+          <!-- input -->
+          <div class="chat-input-area">
+            <input type="text" id="messageInput" placeholder="Pesan kaca...">
+            <button class="send-btn" id="sendMessageBtn"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // STATE
+    let currentUser = { name: 'Alex C.', email: 'alex@expand.ai', avatar: 'A' };
+    // OpenRouter API key (sesuai permintaan)
+    const OPENROUTER_API_KEY = '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';
+    const openRouterBase = 'https://openrouter.ai/api/v1/chat/completions';
+
+    // UI elements
+    const loginScreen = document.getElementById('loginScreen');
+    const mainScreen = document.getElementById('mainScreen');
+    const loginBtn = document.getElementById('loginBtn');
+    const accountRows = document.querySelectorAll('.account-row');
+    const displayNameSide = document.getElementById('displayNameSide');
+    const displayEmailSide = document.getElementById('displayEmailSide');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const chatMessages = document.getElementById('chatMessages');
+    const sendBtn = document.getElementById('sendMessageBtn');
+    const messageInput = document.getElementById('messageInput');
+    
+    // Model selectors: quick (navbar) dan sidebar
+    const quickModelSelect = document.getElementById('quickModelSelect');
+    const modelSelectSide = document.getElementById('modelSelectSide');
+    const currentModelLabel = document.getElementById('currentModelLabel');
+    
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const tempRange = document.getElementById('tempRange');
+
+    // Sinkronisasi kedua dropdown model
+    function syncModelSelectors(value) {
+      quickModelSelect.value = value;
+      modelSelectSide.value = value;
+      currentModelLabel.innerText = value;
+    }
+
+    quickModelSelect.addEventListener('change', function(e) {
+      syncModelSelectors(e.target.value);
+    });
+    modelSelectSide.addEventListener('change', function(e) {
+      syncModelSelectors(e.target.value);
+    });
+
+    // Login: pilih akun
+    let selectedAccountRow = null;
+    accountRows.forEach(row => {
+      row.addEventListener('click', function() {
+        accountRows.forEach(r => r.style.background = 'rgba(255,255,255,0.3)');
+        this.style.background = 'rgba(255,255,255,0.7)';
+        selectedAccountRow = this;
+      });
+    });
+
+    loginBtn.addEventListener('click', function() {
+      if (!selectedAccountRow) {
+        alert('Silakan pilih akun terlebih dahulu');
+        return;
+      }
+      const name = selectedAccountRow.dataset.username;
+      const email = selectedAccountRow.dataset.email;
+      const avatar = selectedAccountRow.dataset.avatar;
+      currentUser = { name, email, avatar };
+
+      displayNameSide.innerText = currentUser.name;
+      displayEmailSide.innerText = currentUser.email;
+
+      loginScreen.classList.remove('active');
+      mainScreen.classList.add('active');
+
+      // Reset chat
+      chatMessages.innerHTML = `
+        <div class="message bot">
+          <div class="avatar-bot"><i class="fas fa-robot"></i></div>
+          <div class="bubble">Selamat datang, ${currentUser.name}. Model aktif: ${quickModelSelect.value}</div>
+        </div>
+      `;
+    });
+
+    logoutBtn.addEventListener('click', function() {
+      mainScreen.classList.remove('active');
+      loginScreen.classList.add('active');
+      accountRows.forEach(r => r.style.background = 'rgba(255,255,255,0.3)');
+      selectedAccountRow = null;
+    });
+
+    // dark mode
+    darkModeToggle.addEventListener('change', function(e) {
+      if (e.target.checked) {
+        document.body.style.background = 'linear-gradient(145deg, #1a2635 0%, #2a3444 100%)';
+        document.body.style.color = '#f0f3fa';
+      } else {
+        document.body.style.background = 'linear-gradient(145deg, #b8b9ff 0%, #dfe9ff 70%, #ffffff 100%)';
+        document.body.style.color = '#1e293b';
+      }
+    });
+
+    // Fungsi kirim pesan ke OpenRouter (dengan API key nyata)
+    async function sendMessageToOpenRouter(userMessage, model, temperature) {
+      // Tampilkan pesan user
+      appendMessage(userMessage, 'user');
+
+      const requestBody = {
+        model: model,
+        messages: [
+          { role: 'system', content: 'Kamu adalah asisten EpanD AI yang membantu dan ramah.' },
+          { role: 'user', content: userMessage }
+        ],
+        temperature: parseFloat(temperature),
+      };
+
+      console.log('Sending to OpenRouter with key:', OPENROUTER_API_KEY.slice(0,15)+'...', requestBody);
+
+      const typingId = showTypingIndicator();
+
+      try {
+        const response = await fetch(openRouterBase, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+            'HTTP-Referer': window.location.origin,
+            'X-Title': 'EpanD AI Glass'
+          },
+          body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json();
+        removeTypingIndicator(typingId);
+        const reply = data.choices?.[0]?.message?.content || 'Tidak ada respons dari AI.';
+        appendMessage(reply, 'bot');
+      } catch (error) {
+        removeTypingIndicator(typingId);
+        console.error('Fetch error:', error);
+        appendMessage(`🌐 Error: ${error.message}. Cek console & API key.`, 'bot');
+      }
+    }
+
+    function appendMessage(text, sender) {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('message', sender);
+      const avatar = sender === 'user' 
+        ? '<div class="avatar-user"><i class="fas fa-user"></i></div>' 
+        : '<div class="avatar-bot"><i class="fas fa-robot"></i></div>';
+      msgDiv.innerHTML = avatar + `<div class="bubble">${escapeHTML(text)}</div>`;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    let typingCount = 0;
+    function showTypingIndicator() {
+      const id = 'typing-' + (typingCount++);
+      const typingDiv = document.createElement('div');
+      typingDiv.classList.add('message', 'bot');
+      typingDiv.id = id;
+      typingDiv.innerHTML = `<div class="avatar-bot"><i class="fas fa-robot"></i></div><div class="bubble"><i>EpanD sedang mengetik...</i></div>`;
+      chatMessages.appendChild(typingDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      return id;
+    }
+
+    function removeTypingIndicator(id) {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>"]/g, function(m) {
+        if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; if(m === '"') return '&quot;';
+        return m;
+      });
+    }
+
+    // Send message handler
+    function onSendMessage() {
+      const text = messageInput.value.trim();
+      if (!text) return;
+      const model = quickModelSelect.value;  // pakai model dari quick select (sama dengan sidebar)
+      const temp = tempRange.value;
+      sendMessageToOpenRouter(text, model, temp);
+      messageInput.value = '';
+    }
+
+    sendBtn.addEventListener('click', onSendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') onSendMessage();
+    });
+
+    // Inisialisasi label model
+    syncModelSelectors(quickModelSelect.value);
+    // Simpan api key di localStorage optional, sudah hardcoded
+    // Dark mode default off
+    darkModeToggle.checked = false;
+  })();
+</script>
+</body>
+</html>
