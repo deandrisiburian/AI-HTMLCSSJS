@@ -30,11 +30,9 @@ EpanD AI adalah aplikasi web chat asisten cerdas yang terintegrasi dengan OpenRo
 
 ### 💬 Chat dengan AI
 - **Multi-model AI**: Dukungan berbagai model melalui OpenRouter
-  - GPT-3.5 Turbo & GPT-4
-  - Claude 2
-  - Google PaLM 2
-  - Llama 2 70B
-  - Dan lainnya
+  - Nemotron Nano 9B v2
+  - Nemotron Nano 12B 2 VL
+  - Nemotron 3 Nano 30B A3B
 - **Real-time chat** dengan interface responsif
 - **Auto-scroll** ke pesan terbaru
 - **Loading indicator** saat AI merespons
@@ -150,9 +148,9 @@ const OPENROUTER_CONFIG = {
 ### Model AI Tersedia
 ```javascript
 const AVAILABLE_MODELS = [
-    { id: 'openai/gpt-3.5-turbo', name: 'GPT-3.5 Turbo' },
-    { id: 'openai/gpt-4', name: 'GPT-4' },
-    { id: 'anthropic/claude-2', name: 'Claude 2' }
+    { id: 'nvidia/nemotron-nano-9b-v2:free', name: 'Nemotron Nano 9B v2' },
+    { id: 'nvidia/nemotron-nano-12b-v2-vl:free', name: 'Nemotron Nano 12B 2 VL' },
+    { id: 'nvidia/nemotron-3-nano-30b-a3b:free', name: '>Nemotron 3 Nano 30B A3B' }
 ];
 ```
 
