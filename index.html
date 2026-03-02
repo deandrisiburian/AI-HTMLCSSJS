@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>EpanD AI</title>
+  <title>EpanD AI · NVIDIA · glass</title>
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -162,15 +162,16 @@
       background: rgba(20, 30, 50, 0.9);
     }
 
-    /* ------ MAIN LAYOUT with SIDEBAR ------ */
+    /* ------ MAIN LAYOUT with SIDEBAR (desktop) ------ */
     .main-layout {
       display: flex;
       flex-direction: row;
       gap: 16px;
       min-height: 80vh;
+      position: relative;
     }
 
-    /* SIDEBAR (settings) */
+    /* SIDEBAR (settings) - desktop */
     .settings-sidebar {
       width: 280px;
       backdrop-filter: blur(20px) saturate(200%);
@@ -182,7 +183,7 @@
       flex-direction: column;
       gap: 24px;
       flex-shrink: 0;
-      transition: all 0.2s;
+      transition: all 0.3s ease;
       height: fit-content;
     }
 
@@ -247,7 +248,6 @@
       transform: translateX(23px);
     }
 
-    /* model select in sidebar (secondary) but we also put quick select in navbar */
     .model-select-side {
       width: 100%;
       background: rgba(255,255,255,0.5);
@@ -327,6 +327,12 @@
       gap: 8px;
     }
 
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
     .quick-model-selector {
       display: flex;
       align-items: center;
@@ -350,6 +356,25 @@
     .quick-model-selector i {
       font-size: 1.2rem;
       opacity: 0.8;
+    }
+
+    /* Tombol toggle sidebar untuk mobile */
+    .sidebar-toggle-btn {
+      display: none;
+      background: rgba(255,255,255,0.4);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 40px;
+      width: 48px;
+      height: 48px;
+      font-size: 1.5rem;
+      color: #1e293b;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+    }
+    .sidebar-toggle-btn:active {
+      background: rgba(255,255,255,0.7);
     }
 
     /* chat window */
@@ -461,17 +486,52 @@
       transform: scale(0.9);
     }
 
-    /* mobile: sidebar collapses to top */
+    /* Overlay untuk mobile */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.2);
+      backdrop-filter: blur(3px);
+      z-index: 98;
+    }
+
+    /* Mobile: sidebar bisa di-toggle */
     @media (max-width: 800px) {
       .main-layout {
         flex-direction: column;
       }
+      
       .settings-sidebar {
-        width: 100%;
-        order: 2;
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        width: calc(100% - 24px);
+        max-width: 320px;
+        height: calc(100vh - 24px);
+        z-index: 99;
+        transform: translateX(-120%);
+        transition: transform 0.3s ease;
+        overflow-y: auto;
       }
-      .chat-content {
-        order: 1;
+      
+      .settings-sidebar.open {
+        transform: translateX(0);
+      }
+      
+      .sidebar-toggle-btn {
+        display: flex;
+      }
+      
+      .sidebar-overlay {
+        display: block;
+      }
+      
+      .sidebar-overlay.hidden {
+        display: none;
       }
     }
   </style>
@@ -484,7 +544,7 @@
       <div class="logo-area">
         <i class="fas fa-sparkles logo-icon"></i>
         <h1>EpanD AI</h1>
-        <p style="color:#2c3e4e;">Simple Chatbot AI</p>
+        <p style="color:#2c3e4e;">NVIDIA · liquid glass</p>
       </div>
       <div style="margin: 1.2rem 0 0.8rem;">
         <p style="font-weight: 400; margin-bottom: 1rem;">pilih akun demo</p>
@@ -493,7 +553,7 @@
           <div class="account-avatar">A</div>
           <div class="account-info">
             <h3>Alex C.</h3>
-            <p>alex@expand.ai · 🌟 CC</p>
+            <p>alex@expand.ai · 🌟 creator</p>
           </div>
         </div>
         <!-- Akun 2 -->
@@ -501,20 +561,23 @@
           <div class="account-avatar">S</div>
           <div class="account-info">
             <h3>Samira K.</h3>
-            <p>samira@expand.ai · ⚡ ARC</p>
+            <p>samira@expand.ai · ⚡ architect</p>
           </div>
         </div>
       </div>
       <button class="btn-login" id="loginBtn"> <i class="fas fa-arrow-right-to-bracket" style="margin-right: 8px;"></i> masuk dengan akun dipilih</button>
-      <p style="text-align: center; margin-top: 20px; font-size: 0.9rem;">EpanD Creation</p>
+      <p style="text-align: center; margin-top: 20px; font-size: 0.9rem;">OpenRouter · model NVIDIA gratis</p>
     </div>
   </div>
 
-  <!-- MAIN SCREEN with SIDEBAR (settings) -->
+  <!-- MAIN SCREEN with TOGGLEABLE SIDEBAR -->
   <div id="mainScreen" class="screen">
+    <!-- Overlay untuk mobile -->
+    <div class="sidebar-overlay hidden" id="sidebarOverlay"></div>
+    
     <div class="main-layout">
       
-      <!-- LEFT SIDEBAR (settings & akun) -->
+      <!-- LEFT SIDEBAR (settings & akun) - bisa di-toggle di mobile -->
       <aside class="settings-sidebar glass-card" id="settingsSidebar">
         <h3><i class="fas fa-sliders-h"></i> Pengaturan</h3>
         
@@ -541,8 +604,8 @@
         </div>
 
         <div class="api-hint">
-          <i class="fas fa-key"></i> API Key aktif: <strong>sk-or-...5065</strong> (tersimpan)<br>
-          <span style="font-size: 0.8rem;">(simulasi fetch, lihat console)</span>
+          <i class="fas fa-key"></i> API Key: <strong style="font-size: 0.7rem;">sk-or-v1-acc5...5065</strong><br>
+          <span style="font-size: 0.8rem;">(terhubung ke OpenRouter)</span>
         </div>
 
         <!-- Account card inside sidebar -->
@@ -555,19 +618,24 @@
 
       <!-- RIGHT CHAT CONTENT -->
       <div class="chat-content">
-        <!-- Navbar with quick model switcher (NVIDIA models) -->
+        <!-- Navbar with quick model switcher & toggle sidebar button -->
         <div class="nav-glass">
           <div class="nav-brand">
             <i class="fas fa-cloud" style="font-size: 1.8rem;"></i>
             <span>EpanD</span>
           </div>
-          <div class="quick-model-selector">
-            <i class="fas fa-microchip"></i>
-            <select id="quickModelSelect" title="Ganti model AI langsung">
-              <option value="nvidia/nemotron-nano-9b-v2:free" selected>Nano 9B</option>
-              <option value="nvidia/nemotron-nano-12b-v2-vl:free">Nano 12B VL</option>
-              <option value="nvidia/nemotron-3-nano-30b-a3b:free">Nemotron 30B</option>
-            </select>
+          <div class="nav-controls">
+            <div class="quick-model-selector">
+              <i class="fas fa-microchip"></i>
+              <select id="quickModelSelect" title="Ganti model AI langsung">
+                <option value="nvidia/nemotron-nano-9b-v2:free" selected>Nano 9B</option>
+                <option value="nvidia/nemotron-nano-12b-v2-vl:free">Nano 12B VL</option>
+                <option value="nvidia/nemotron-3-nano-30b-a3b:free">Nemotron 30B</option>
+              </select>
+            </div>
+            <button class="sidebar-toggle-btn" id="sidebarToggleBtn">
+              <i class="fas fa-sliders-h"></i>
+            </button>
           </div>
         </div>
 
@@ -598,7 +666,7 @@
   (function() {
     // STATE
     let currentUser = { name: 'Alex C.', email: 'alex@expand.ai', avatar: 'A' };
-    // OpenRouter API key (sesuai permintaan)
+    // OPENROUTER API KEY (YANG BENAR)
     const OPENROUTER_API_KEY = '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';
     const openRouterBase = 'https://openrouter.ai/api/v1/chat/completions';
 
@@ -614,7 +682,7 @@
     const sendBtn = document.getElementById('sendMessageBtn');
     const messageInput = document.getElementById('messageInput');
     
-    // Model selectors: quick (navbar) dan sidebar
+    // Model selectors
     const quickModelSelect = document.getElementById('quickModelSelect');
     const modelSelectSide = document.getElementById('modelSelectSide');
     const currentModelLabel = document.getElementById('currentModelLabel');
@@ -622,7 +690,12 @@
     const darkModeToggle = document.getElementById('darkModeToggle');
     const tempRange = document.getElementById('tempRange');
 
-    // Sinkronisasi kedua dropdown model
+    // Sidebar toggle elements
+    const settingsSidebar = document.getElementById('settingsSidebar');
+    const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    // Sinkronisasi model selectors
     function syncModelSelectors(value) {
       quickModelSelect.value = value;
       modelSelectSide.value = value;
@@ -636,7 +709,19 @@
       syncModelSelectors(e.target.value);
     });
 
-    // Login: pilih akun
+    // Sidebar toggle functions (untuk mobile)
+    function openSidebar() {
+      settingsSidebar.classList.add('open');
+      sidebarOverlay.classList.remove('hidden');
+    }
+    function closeSidebar() {
+      settingsSidebar.classList.remove('open');
+      sidebarOverlay.classList.add('hidden');
+    }
+    sidebarToggleBtn.addEventListener('click', openSidebar);
+    sidebarOverlay.addEventListener('click', closeSidebar);
+
+    // Login
     let selectedAccountRow = null;
     accountRows.forEach(row => {
       row.addEventListener('click', function() {
@@ -676,9 +761,10 @@
       loginScreen.classList.add('active');
       accountRows.forEach(r => r.style.background = 'rgba(255,255,255,0.3)');
       selectedAccountRow = null;
+      closeSidebar(); // tutup sidebar jika terbuka
     });
 
-    // dark mode
+    // Dark mode
     darkModeToggle.addEventListener('change', function(e) {
       if (e.target.checked) {
         document.body.style.background = 'linear-gradient(145deg, #1a2635 0%, #2a3444 100%)';
@@ -689,7 +775,7 @@
       }
     });
 
-    // Fungsi kirim pesan ke OpenRouter (dengan API key nyata)
+    // Fungsi kirim pesan ke OpenRouter (dengan API key yang benar)
     async function sendMessageToOpenRouter(userMessage, model, temperature) {
       // Tampilkan pesan user
       appendMessage(userMessage, 'user');
@@ -703,7 +789,7 @@
         temperature: parseFloat(temperature),
       };
 
-      console.log('Sending to OpenRouter with key:', OPENROUTER_API_KEY.slice(0,15)+'...', requestBody);
+      console.log('Sending to OpenRouter with key:', OPENROUTER_API_KEY.substring(0,15)+'...', requestBody);
 
       const typingId = showTypingIndicator();
 
@@ -720,8 +806,8 @@
         });
 
         if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP ${response.status}: ${errorText}`);
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(`HTTP ${response.status}: ${errorData.error?.message || response.statusText}`);
         }
 
         const data = await response.json();
@@ -774,7 +860,7 @@
     function onSendMessage() {
       const text = messageInput.value.trim();
       if (!text) return;
-      const model = quickModelSelect.value;  // pakai model dari quick select (sama dengan sidebar)
+      const model = quickModelSelect.value;
       const temp = tempRange.value;
       sendMessageToOpenRouter(text, model, temp);
       messageInput.value = '';
@@ -785,10 +871,8 @@
       if (e.key === 'Enter') onSendMessage();
     });
 
-    // Inisialisasi label model
+    // Inisialisasi
     syncModelSelectors(quickModelSelect.value);
-    // Simpan api key di localStorage optional, sudah hardcoded
-    // Dark mode default off
     darkModeToggle.checked = false;
   })();
 </script>
