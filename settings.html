@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EpanD AI - Settings</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="logo">EpanD AI</div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="login.html">Login</a>
+                <a href="chat.html">Chat</a>
+                <a href="settings.html" class="active">Settings</a>
+            </div>
+            <div class="user-info" id="userInfo">
+                <span id="username"></span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </nav>
+
+        <div class="settings-container">
+            <h2>Pengaturan</h2>
+            
+            <div class="settings-section">
+                <h3>Pengaturan Umum</h3>
+                <div class="setting-item">
+                    <label for="theme">Tema:</label>
+                    <select id="theme" onchange="saveSetting('theme', this.value)">
+                        <option value="light">Terang</option>
+                        <option value="dark">Gelap</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="language">Bahasa:</label>
+                    <select id="language" onchange="saveSetting('language', this.value)">
+                        <option value="id">Indonesia</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Pengaturan Chat</h3>
+                <div class="setting-item">
+                    <label for="temperature">Temperature (Kreativitas):</label>
+                    <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7" onchange="saveSetting('temperature', this.value)">
+                    <span id="tempValue">0.7</span>
+                </div>
+                <div class="setting-item">
+                    <label for="maxTokens">Max Tokens:</label>
+                    <input type="number" id="maxTokens" min="100" max="4000" value="2000" onchange="saveSetting('maxTokens', this.value)">
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Pengaturan API</h3>
+                <div class="setting-item">
+                    <label for="apiKey">OpenRouter API Key:</label>
+                    <input type="password" id="apiKey" value="YOUR_API_KEY" onchange="saveSetting('apiKey', this.value)">
+                </div>
+                <div class="setting-item">
+                    <label for="apiEndpoint">API Endpoint:</label>
+                    <input type="text" id="apiEndpoint" value="https://openrouter.ai/api/v1/chat/completions" readonly>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Informasi Akun</h3>
+                <div class="setting-item">
+                    <label>Username:</label>
+                    <span id="accountUsername"></span>
+                </div>
+                <div class="setting-item">
+                    <label>Status:</label>
+                    <span id="accountStatus">Active</span>
+                </div>
+            </div>
+
+            <button onclick="resetSettings()" class="btn btn-secondary">Reset ke Default</button>
+            <button onclick="saveAllSettings()" class="btn btn-primary">Simpan Semua</button>
+        </div>
+    </div>
+    <script src="js/auth.js"></script>
+    <script src="js/settings.js"></script>
+</body>
+</html>
