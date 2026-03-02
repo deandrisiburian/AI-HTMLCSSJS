@@ -1,5 +1,5 @@
 let currentChat = [];
-let currentModel = 'openai/gpt-3.5-turbo';
+let currentModel = 'nvidia/nemotron-nano-9b-v2:free';
 
 // Inisialisasi chat
 document.addEventListener('DOMContentLoaded', function() {
