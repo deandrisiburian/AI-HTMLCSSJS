@@ -2,49 +2,118 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>EpanD AI - Home</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="gradient-orb"></div>
+        <div class="gradient-orb"></div>
+        <div class="gradient-orb"></div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+
     <div class="container">
+        <!-- Navbar -->
         <nav class="navbar">
             <div class="logo">EpanD AI</div>
-            <div class="nav-links">
+            
+            <!-- Hamburger Menu Button -->
+            <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <!-- Navigation Links -->
+            <div class="nav-links" id="navLinks">
                 <a href="index.html" class="active">Home</a>
                 <a href="login.html">Login</a>
                 <a href="chat.html">Chat</a>
                 <a href="settings.html">Settings</a>
+                
+                <!-- Mobile User Info -->
+                <div class="mobile-user-info" id="mobileUserInfo" style="display: none;">
+                    <span id="mobileUsername"></span>
+                    <button onclick="logout()" class="btn-logout">Logout</button>
+                </div>
+            </div>
+
+            <!-- Desktop User Info -->
+            <div class="user-info desktop-only" id="userInfo">
+                <span id="usernameDisplay"></span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
             </div>
         </nav>
 
+        <!-- Main Content -->
         <main class="hero-section">
             <h1>Selamat Datang di EpanD AI</h1>
-            <p>Asisten AI cerdas untuk membantu pekerjaan Anda</p>
+            <p>Asisten AI cerdas dengan teknologi terbaru untuk membantu pekerjaan Anda</p>
             <div class="cta-buttons">
                 <a href="login.html" class="btn btn-primary">Mulai Chat</a>
                 <a href="#features" class="btn btn-secondary">Pelajari Lebih</a>
             </div>
         </main>
 
+        <!-- Features Section -->
         <section id="features" class="features">
             <h2>Fitur Unggulan</h2>
             <div class="feature-grid">
-                <div class="feature-card">
+                <div class="feature-card glass-liquid">
+                    <div class="feature-icon">💬</div>
                     <h3>Chat Cerdas</h3>
-                    <p>Berinteraksi dengan AI menggunakan bahasa alami</p>
+                    <p>Berinteraksi dengan AI menggunakan bahasa alami, respons cepat dan akurat</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card glass-liquid">
+                    <div class="feature-icon">🤖</div>
                     <h3>Multi Model</h3>
-                    <p>Dukungan berbagai model AI melalui OpenRouter</p>
+                    <p>Dukungan berbagai model AI melalui OpenRouter: GPT-4, Claude, Llama, dan lainnya</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card glass-liquid">
+                    <div class="feature-icon">⚙️</div>
                     <h3>Kustomisasi</h3>
-                    <p>Sesuaikan pengalaman chat sesuai kebutuhan</p>
+                    <p>Sesuaikan pengalaman chat sesuai kebutuhan dengan berbagai opsi pengaturan</p>
+                </div>
+                <div class="feature-card glass-liquid">
+                    <div class="feature-icon">📱</div>
+                    <h3>Mobile Friendly</h3>
+                    <p>Tampilan responsif yang nyaman digunakan di smartphone dan tablet</p>
+                </div>
+                <div class="feature-card glass-liquid">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Glassmorphism</h3>
+                    <p>Desain modern dengan efek kaca dan animasi yang halus</p>
+                </div>
+                <div class="feature-card glass-liquid">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Aman & Privasi</h3>
+                    <p>Data Anda aman dengan enkripsi dan kebijakan privasi yang ketat</p>
                 </div>
             </div>
         </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="cta-content glass-liquid">
+                <h2>Siap untuk mencoba EpanD AI?</h2>
+                <p>Bergabunglah dengan ribuan pengguna yang telah merasakan kecanggihan AI</p>
+                <a href="login.html" class="btn btn-primary btn-large">Mulai Sekarang</a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2026 EpanD AI. All rights reserved.</p>
+        </footer>
     </div>
+
+    <script src="config/config.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
